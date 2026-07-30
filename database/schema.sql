@@ -73,3 +73,17 @@ CREATE TABLE prompts (
     FOREIGN KEY(agent_id)
     REFERENCES ai_agents(id)
 );
+
+CREATE TABLE works (
+
+    id TEXT PRIMARY KEY,
+
+    title TEXT NOT NULL,
+
+    work_type TEXT,
+
+    content TEXT,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+);

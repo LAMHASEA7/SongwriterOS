@@ -1,1 +1,2 @@
 from .sqlite_project_repository import SQLiteProjectRepository
+from .sqlite_work_repository import SQLiteWorkRepository

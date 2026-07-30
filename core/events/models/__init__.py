@@ -1,1 +1,2 @@
 from .project_events import ProjectCreatedEvent
+from .concept_events import ConceptCreatedEvent
