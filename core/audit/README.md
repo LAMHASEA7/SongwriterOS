@@ -16,3 +16,13 @@ Records:
 Goal:
 
 Full traceability.
+
+# Audit System
+
+Provides system history.
+
+Similar to:
+
+- Network Logs
+- Change Records
+- Operation Tracking

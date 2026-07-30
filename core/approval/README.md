@@ -22,3 +22,9 @@ Publish
 
 
 Creative ownership remains human.
+
+# Approval System
+
+Human governance layer.
+
+Ensures creative ownership remains with humans.
