@@ -3,14 +3,19 @@ from core.domain.repositories import ProjectRepository
 
 from core.application.commands import CreateProjectCommand
 
+from core.events.bus.event_bus import EventBus
+from core.events.models import ProjectCreatedEvent
+
 
 class CreateProjectUseCase:
 
     def __init__(
         self,
-        repository: ProjectRepository
+        repository: ProjectRepository,
+        event_bus: EventBus
     ):
         self.repository = repository
+        self.event_bus = event_bus
 
 
     def execute(
@@ -25,6 +30,14 @@ class CreateProjectUseCase:
 
 
         self.repository.save(project)
+
+
+        event = ProjectCreatedEvent(
+            project.id
+        )
+
+
+        self.event_bus.publish(event)
 
 
         return project
