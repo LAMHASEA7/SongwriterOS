@@ -3,10 +3,19 @@
 
 
 CREATE TABLE projects (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
+
+    id TEXT PRIMARY KEY,
+
+    title TEXT NOT NULL,
+
+    project_type TEXT,
+
+    status TEXT DEFAULT 'Draft',
+
     description TEXT,
+
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
 );
 
 
