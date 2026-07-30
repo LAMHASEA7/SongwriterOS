@@ -1,18 +1,24 @@
 # Application Layer
 
-## Responsibility
+Responsible for orchestrating user intentions.
 
-Coordinates use cases.
+## Responsibilities
 
-Examples:
+- Handle Commands
+- Execute Use Cases
+- Coordinate Domain Logic
+- Call Repository Ports
 
-- Create Project
-- Generate Content
-- Review Content
-- Publish Content
+## Rules
 
----
+Application layer must not depend on Infrastructure.
 
-Application uses Domain services.
+Flow:
 
-It does not contain infrastructure logic.
+Command
+    |
+Use Case
+    |
+Domain
+    |
+Repository Port
