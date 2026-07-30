@@ -22,7 +22,7 @@ class LyricAgent(Agent):
         event
     ):
 
-        concept = event.concept
+        concept = event.state["concept"]
 
 
         work = CreativeWork(
