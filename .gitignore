@@ -1,0 +1,23 @@
+# Environment
+.env
+
+# Python
+__pycache__
+*.pyc
+
+# Node
+node_modules
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE
+.vscode/settings.json
