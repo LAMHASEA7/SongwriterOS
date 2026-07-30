@@ -1,16 +1,39 @@
 # Event System
 
-## Purpose
+CreativeOS communication layer.
 
-Provides communication between modules.
 
-Examples:
+## Responsibility
 
-- ProjectCreated
-- LyricsGenerated
-- ReviewCompleted
-- ContentApproved
+Manages system events.
 
----
 
-Modules communicate through events.
+## Architecture
+
+
+Module
+
+↓
+
+Publish Event
+
+↓
+
+Event Bus
+
+↓
+
+Subscribers
+
+
+## Design Principle
+
+Modules communicate through events,
+not direct dependencies.
+
+
+## Inspired By
+
+- Telecom Signaling
+- Distributed Systems
+- Enterprise Architecture
