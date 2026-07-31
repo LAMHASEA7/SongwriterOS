@@ -1,20 +1,17 @@
 class AgentDispatcher:
 
+    def __init__(self, event_bus):
 
-    def __init__(
+        self.event_bus = event_bus
+
+
+    def register(
         self,
-        registry
+        event_type,
+        agent
     ):
 
-        self.registry = registry
-
-
-
-    def handle(
-        self,
-        event
-    ):
-
-        for agent in self.registry.all():
-
-            agent.handle(event)
+        self.event_bus.subscribe(
+            event_type,
+            agent.handle
+        )

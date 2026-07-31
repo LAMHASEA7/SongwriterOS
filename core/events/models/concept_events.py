@@ -1,13 +1,8 @@
-from core.events.event import Event
+from dataclasses import dataclass
+from core.domain.models import Concept
 
 
-class ConceptCreatedEvent(Event):
+@dataclass
+class ConceptCreatedEvent:
 
-    def __init__(
-        self,
-        concept
-    ):
-
-        super().__init__()
-
-        self.concept = concept
+    concept: Concept
