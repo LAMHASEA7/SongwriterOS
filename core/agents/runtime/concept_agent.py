@@ -8,11 +8,13 @@ class ConceptAgent:
     name = "Concept Agent"
     capability = AgentCapability.CONCEPT
 
+
     def __init__(self, event_bus):
 
         self.event_bus = event_bus
 
-    def handle(self, event):
+
+    def handle(self, event: object) -> Concept:
 
         concept = Concept(
             theme="Memory",
@@ -20,8 +22,17 @@ class ConceptAgent:
             message="Keep the moment"
         )
 
+
         print(
-            f"Concept Agent created: {concept}"
+            f"{self.name} created: {concept}"
         )
+
+
+        self.event_bus.publish(
+            ConceptCreatedEvent(
+                concept=concept
+            )
+        )
+
 
         return concept
