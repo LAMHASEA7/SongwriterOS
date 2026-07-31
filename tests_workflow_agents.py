@@ -16,6 +16,23 @@ from core.infrastructure.repositories import (
     SQLiteWorkRepository
 )
 
+from core.ai.runtime import (
+    ProviderRegistry,
+    AIService
+)
+
+from core.ai.providers import (
+    MockProvider
+)
+
+from core.events.models import (
+    ProjectCreatedEvent
+)
+
+
+# =========================
+# Infrastructure
+# =========================
 
 event_bus = EventBus()
 
@@ -25,16 +42,40 @@ work_repository = SQLiteWorkRepository(
 )
 
 
+# =========================
+# AI Layer
+# =========================
+
+registry = ProviderRegistry()
+
+registry.register(
+    MockProvider()
+)
+
+
+ai_service = AIService(
+    registry
+)
+
+
+# =========================
+# Agents
+# =========================
+
 concept_agent = ConceptAgent(
     event_bus
 )
 
 
 lyric_agent = LyricAgent(
-    work_repository
+    work_repository,
+    ai_service
 )
 
 
+# =========================
+# Workflow Definition
+# =========================
 
 workflow = Workflow(
     "Song Creation Workflow"
@@ -58,11 +99,11 @@ workflow.add_step(
 )
 
 
+# =========================
+# Execute Workflow
+# =========================
 
 engine = WorkflowEngine()
-
-
-from core.events.models import ProjectCreatedEvent
 
 
 event = ProjectCreatedEvent(
@@ -75,10 +116,17 @@ execution = engine.execute(
     event
 )
 
+
+# =========================
+# Result
+# =========================
+
 print()
 
+print("STATUS:")
 print(execution.status)
 
 print()
 
+print("HISTORY:")
 print(execution.history)

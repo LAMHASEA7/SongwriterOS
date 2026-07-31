@@ -1,0 +1,1 @@
+from .lyric_prompt import LyricPrompt
