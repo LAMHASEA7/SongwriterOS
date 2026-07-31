@@ -29,6 +29,8 @@ from core.events.models import (
     ProjectCreatedEvent
 )
 
+from core.config import settings
+
 
 # =========================
 # Infrastructure
@@ -38,7 +40,7 @@ event_bus = EventBus()
 
 
 work_repository = SQLiteWorkRepository(
-    "database/songwriteros.db"
+    settings.database_path
 )
 
 
@@ -48,9 +50,12 @@ work_repository = SQLiteWorkRepository(
 
 registry = ProviderRegistry()
 
-registry.register(
-    MockProvider()
-)
+
+if settings.ai_provider == "mock":
+
+    registry.register(
+        MockProvider()
+    )
 
 
 ai_service = AIService(
@@ -74,7 +79,7 @@ lyric_agent = LyricAgent(
 
 
 # =========================
-# Workflow Definition
+# Workflow
 # =========================
 
 workflow = Workflow(
@@ -100,7 +105,7 @@ workflow.add_step(
 
 
 # =========================
-# Execute Workflow
+# Execute
 # =========================
 
 engine = WorkflowEngine()
@@ -116,10 +121,6 @@ execution = engine.execute(
     event
 )
 
-
-# =========================
-# Result
-# =========================
 
 print()
 

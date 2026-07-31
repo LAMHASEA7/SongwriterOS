@@ -1,13 +1,28 @@
+import os
+
 from dataclasses import dataclass
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 @dataclass
 class Settings:
 
-    ai_provider: str = "mock provider"
+    ai_provider: str = (
+        os.getenv(
+            "AI_PROVIDER",
+            "mock"
+        )
+    )
 
     database_path: str = (
-        "database/songwriteros.db"
+        os.getenv(
+            "DATABASE_PATH",
+            "database/songwriteros.db"
+        )
     )
 
 
