@@ -70,7 +70,15 @@ event = ProjectCreatedEvent(
 )
 
 
-engine.execute(
+execution = engine.execute(
     workflow,
     event
 )
+
+print()
+
+print(execution.status)
+
+print()
+
+print(execution.history)
