@@ -19,9 +19,9 @@ class SongCreationWorkflow:
         lyric_agent,
         melody_agent,
         arrangement_agent,
-        persistence_agent,
         event_bus
     ):
+
 
         self.workflow = Workflow(
             name="Song Creation"
@@ -40,6 +40,7 @@ class SongCreationWorkflow:
         self.context = concept_agent.context
 
         self.workflow.context = self.context
+
 
 
         #
@@ -70,6 +71,7 @@ class SongCreationWorkflow:
         )
 
 
+
         #
         # Step 2 Lyrics
         #
@@ -90,6 +92,10 @@ class SongCreationWorkflow:
 
                         ConceptCreatedEvent(
 
+                            project_id=str(
+                                execution.context.song_project.id
+                            ),
+
                             concept=execution.state[
                                 "concept"
                             ]
@@ -103,6 +109,7 @@ class SongCreationWorkflow:
             )
 
         )
+
 
 
         #
@@ -125,7 +132,11 @@ class SongCreationWorkflow:
 
                         LyricsCreatedEvent(
 
-                            work=execution.state[
+                            project_id=str(
+                                execution.context.song_project.id
+                            ),
+
+                            lyrics=execution.state[
                                 "lyrics"
                             ]
 
@@ -138,6 +149,7 @@ class SongCreationWorkflow:
             )
 
         )
+
 
 
         #
@@ -160,6 +172,10 @@ class SongCreationWorkflow:
 
                         MelodyCreatedEvent(
 
+                            project_id=str(
+                                execution.context.song_project.id
+                            ),
+
                             melody=execution.state[
                                 "melody"
                             ]
@@ -174,33 +190,6 @@ class SongCreationWorkflow:
 
         )
 
-
-        #
-        # Step 5 Save Project
-        #
-
-        self.workflow.add_step(
-
-            WorkflowStep(
-
-                name="Save Project",
-
-                handler=AgentStep(
-
-                    name="Persistence Agent",
-
-                    agent=persistence_agent,
-
-                    event_factory=lambda execution:
-                        execution.context.song_project,
-
-                    output_key="project"
-
-                )
-
-            )
-
-        )
 
 
     def build(self):

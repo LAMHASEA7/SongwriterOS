@@ -1,8 +1,21 @@
 from dataclasses import dataclass
-from core.domain.models import Concept
+from datetime import datetime
 
 
 @dataclass
 class ConceptCreatedEvent:
 
-    concept: Concept
+
+    project_id: str = ""
+
+    concept: object = None
+
+    created_at: datetime = None
+
+
+
+    def __post_init__(self):
+
+        if self.created_at is None:
+
+            self.created_at = datetime.utcnow()

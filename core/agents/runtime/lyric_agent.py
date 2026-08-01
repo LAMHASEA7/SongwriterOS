@@ -6,6 +6,7 @@ from core.domain.models import CreativeWork
 
 from core.ai.prompts import LyricPrompt
 
+from core.events.models import LyricsCreatedEvent
 
 
 class LyricAgent(Agent):
@@ -15,15 +16,14 @@ class LyricAgent(Agent):
     capability = AgentCapability.LYRICS
 
 
-
     def __init__(
         self,
-        work_repository,
+        event_bus,
         ai_service,
         context=None
     ):
 
-        self.work_repository = work_repository
+        self.event_bus = event_bus
 
         self.ai_service = ai_service
 
@@ -41,26 +41,33 @@ class LyricAgent(Agent):
 
 
 
+        #
+        # Register Agent
+        #
+
         if context:
 
             context.register_agent(
                 self.name
             )
 
-            context.register_event(
-                "LyricAgentStarted"
-            )
 
 
+        #
+        # Receive Concept Event
+        #
 
         concept = event.concept
 
 
 
+        #
+        # Generate Lyrics
+        #
+
         prompt = LyricPrompt.from_concept(
             concept
         )
-
 
 
         response = self.ai_service.generate(
@@ -71,21 +78,13 @@ class LyricAgent(Agent):
 
         if not response.success:
 
-
             print(
                 "Lyric generation failed:",
                 response.error
             )
 
-
             return None
 
-
-
-        print(
-            "AI Response:",
-            response
-        )
 
 
         print(
@@ -94,6 +93,10 @@ class LyricAgent(Agent):
         )
 
 
+
+        #
+        # Create Domain Object
+        #
 
         work = CreativeWork(
 
@@ -107,18 +110,9 @@ class LyricAgent(Agent):
 
 
 
-        self.work_repository.save(
-            work
-        )
-
-
-
-        print(
-            "Lyric Agent saved:",
-            work
-        )
-
-
+        #
+        # Attach to Context
+        #
 
         if context:
 
@@ -128,17 +122,48 @@ class LyricAgent(Agent):
             )
 
 
-            context.register_event(
-                "LyricsCreatedEvent"
-            )
-
-
             if context.song_project:
-
 
                 context.song_project.attach_lyrics(
                     work
                 )
+
+
+
+        #
+        # Publish Event
+        #
+
+        if context and context.song_project:
+
+
+            lyrics_event = LyricsCreatedEvent(
+
+                project_id=str(
+                    context.song_project.id
+                ),
+
+                lyrics=work
+
+            )
+
+
+            self.event_bus.publish(
+                lyrics_event
+            )
+
+
+            print(
+                "LyricsCreatedEvent published"
+            )
+
+
+
+        else:
+
+            print(
+                "LyricsCreatedEvent skipped: no project context"
+            )
 
 
 

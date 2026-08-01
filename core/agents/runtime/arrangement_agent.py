@@ -51,6 +51,10 @@ class ArrangementAgent:
 
 
 
+        #
+        # Create Arrangement
+        #
+
         arrangement = Arrangement(
 
             instruments="Electric guitar, bass, drums, piano",
@@ -69,6 +73,10 @@ class ArrangementAgent:
 
 
 
+        #
+        # Attach Context
+        #
+
         if context:
 
 
@@ -82,7 +90,9 @@ class ArrangementAgent:
             )
 
 
+
             if context.song_project:
+
 
                 context.song_project.attach_arrangement(
                     arrangement
@@ -90,15 +100,32 @@ class ArrangementAgent:
 
 
 
-        self.event_bus.publish(
+        #
+        # Publish Event
+        #
 
-            ArrangementCreatedEvent(
+        if context and context.song_project:
+
+
+            arrangement_event = ArrangementCreatedEvent(
+
+                project_id=str(
+                    context.song_project.id
+                ),
 
                 arrangement=arrangement
 
             )
 
-        )
+
+            self.event_bus.publish(
+                arrangement_event
+            )
+
+
+            print(
+                "ArrangementCreatedEvent published"
+            )
 
 
 

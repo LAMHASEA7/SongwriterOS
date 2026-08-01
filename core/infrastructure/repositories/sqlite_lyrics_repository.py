@@ -1,10 +1,14 @@
 import sqlite3
 
 
-class SQLiteWorkRepository:
+
+class SQLiteLyricsRepository:
 
 
-    def __init__(self, database_path):
+    def __init__(
+        self,
+        database_path
+    ):
 
         self.database_path = database_path
 
@@ -12,8 +16,8 @@ class SQLiteWorkRepository:
 
     def save(
         self,
-        work,
-        project_id=None
+        lyrics,
+        song_id
     ):
 
         connection = sqlite3.connect(
@@ -25,17 +29,15 @@ class SQLiteWorkRepository:
 
         cursor.execute(
             """
-            INSERT INTO works
+            INSERT INTO lyrics
             (
-                id,
-                project_id,
-                title,
-                work_type,
-                content
+                song_id,
+                version,
+                content,
+                score
             )
             VALUES
             (
-                ?,
                 ?,
                 ?,
                 ?,
@@ -43,11 +45,10 @@ class SQLiteWorkRepository:
             )
             """,
             (
-                str(work.id),
-                project_id,
-                work.title,
-                work.work_type,
-                work.content
+                song_id,
+                1,
+                lyrics.content,
+                None
             )
         )
 
@@ -55,3 +56,8 @@ class SQLiteWorkRepository:
         connection.commit()
 
         connection.close()
+
+
+        print(
+            "Lyrics saved"
+        )

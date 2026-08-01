@@ -5,6 +5,7 @@ from core.application import WorkflowResult
 from .models import WorkflowExecution
 
 
+
 class WorkflowEngine:
     """
     Executes creative workflows.
@@ -17,14 +18,20 @@ class WorkflowEngine:
         input_event=None
     ):
 
+
         execution = WorkflowExecution(
             input_event=input_event
         )
+
+
         if workflow.context:
 
             execution.context = workflow.context
 
+
+
         execution.status = "RUNNING"
+
 
 
         print(
@@ -32,41 +39,117 @@ class WorkflowEngine:
         )
 
 
-        for step in workflow.steps:
 
-            execution.current_step = step.name
+        try:
 
 
-            execution.history.append(
-                {
+            for step in workflow.steps:
+
+
+                execution.current_step = step.name
+
+
+                history_item = {
+
                     "step": step.name,
-                    "status": "RUNNING"
-                }
-            )
 
+                    "status": "RUNNING",
+
+                    "started_at": datetime.utcnow().isoformat()
+
+                }
+
+
+                execution.history.append(
+                    history_item
+                )
+
+
+
+                print(
+                    f"Executing step: {step.name}"
+                )
+
+
+
+                try:
+
+
+                    result = step.handler(
+                        execution
+                    )
+
+
+                    history_item["status"] = "SUCCESS"
+
+
+                    history_item[
+                        "finished_at"
+                    ] = datetime.utcnow().isoformat()
+
+
+
+                    if step.output_key:
+
+
+                        execution.state[
+                            step.output_key
+                        ] = result
+
+
+
+
+                except Exception as error:
+
+
+                    history_item["status"] = "FAILED"
+
+                    history_item[
+                        "error"
+                    ] = str(error)
+
+
+
+                    execution.status = "FAILED"
+
+
+
+                    print(
+                        f"Step failed: {step.name}"
+                    )
+
+
+                    print(
+                        error
+                    )
+
+
+                    break
+
+
+
+
+            if execution.status != "FAILED":
+
+
+                execution.status = "SUCCESS"
+
+
+
+        except Exception as error:
+
+
+            execution.status = "FAILED"
 
             print(
-                f"Executing step: {step.name}"
+                "Workflow failed:"
+            )
+
+            print(
+                error
             )
 
 
-            result = step.handler(
-                execution
-            )
-
-
-            execution.history[-1]["status"] = "SUCCESS"
-
-
-            if step.output_key:
-
-                execution.state[
-                    step.output_key
-                ] = result
-
-
-
-        execution.status = "SUCCESS"
 
 
         execution.finished_at = datetime.utcnow()
@@ -79,7 +162,15 @@ class WorkflowEngine:
 
             project_id=execution.context.project_id,
 
-            message="Workflow completed successfully",
+            message=(
+
+                "Workflow completed successfully"
+
+                if execution.status == "SUCCESS"
+
+                else "Workflow failed"
+
+            ),
 
             context=execution.context,
 

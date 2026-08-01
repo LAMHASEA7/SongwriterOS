@@ -1,8 +1,10 @@
 class EventBus:
 
+
     def __init__(self):
 
-        self.subscribers = {}
+        self.listeners = {}
+
 
 
     def subscribe(
@@ -11,13 +13,15 @@ class EventBus:
         handler
     ):
 
-        if event_type not in self.subscribers:
-            self.subscribers[event_type] = []
+        if event_type not in self.listeners:
+
+            self.listeners[event_type] = []
 
 
-        self.subscribers[event_type].append(
+        self.listeners[event_type].append(
             handler
         )
+
 
 
     def publish(
@@ -27,22 +31,26 @@ class EventBus:
 
         event_type = type(event)
 
-        handlers = self.subscribers.get(
+
+        handlers = self.listeners.get(
             event_type,
             []
         )
 
 
-        results = []
-
-
         for handler in handlers:
 
-            result = handler(event)
+            try:
 
-            results.append(
-                result
-            )
+                handler(event)
 
 
-        return results
+            except Exception as error:
+
+                print(
+                    f"Event handler failed: {handler.__name__}"
+                )
+
+                print(
+                    error
+                )

@@ -1,18 +1,11 @@
 -- SongwriterOS Database Schema
 -- Version 0.1.0
 
-
 CREATE TABLE projects (
 
     id TEXT PRIMARY KEY,
 
     title TEXT NOT NULL,
-
-    project_type TEXT,
-
-    status TEXT DEFAULT 'Draft',
-
-    description TEXT,
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 
@@ -29,31 +22,42 @@ CREATE TABLE styles (
 
 
 CREATE TABLE songs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id INTEGER,
-    style_id INTEGER,
+
+    id TEXT PRIMARY KEY,
+
+    project_id TEXT,
+
+    style_id TEXT,
+
     title TEXT NOT NULL,
+
     genre TEXT,
+
     status TEXT,
+
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
 
     FOREIGN KEY(project_id)
     REFERENCES projects(id),
 
+
     FOREIGN KEY(style_id)
     REFERENCES styles(id)
+
 );
 
 
 CREATE TABLE lyrics (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    song_id INTEGER,
-    version INTEGER,
-    content TEXT,
-    score REAL,
 
-    FOREIGN KEY(song_id)
-    REFERENCES songs(id)
+    id TEXT PRIMARY KEY,
+
+    song_id TEXT,
+
+    content TEXT,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
 );
 
 
@@ -78,12 +82,17 @@ CREATE TABLE works (
 
     id TEXT PRIMARY KEY,
 
+    project_id TEXT,
+
     title TEXT NOT NULL,
 
     work_type TEXT,
 
     content TEXT,
 
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY(project_id)
+    REFERENCES projects(id)
 
 );
