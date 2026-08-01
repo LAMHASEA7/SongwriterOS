@@ -1,6 +1,5 @@
 import sqlite3
 
-
 from core.domain.song_project import SongProject
 
 
@@ -32,7 +31,7 @@ class SQLiteProjectRepository:
 
         cursor.execute(
             """
-            INSERT OR REPLACE INTO projects
+            INSERT INTO projects
             (
                 id,
                 title,
@@ -40,6 +39,7 @@ class SQLiteProjectRepository:
                 status,
                 description
             )
+
             VALUES
             (
                 ?,
@@ -48,21 +48,45 @@ class SQLiteProjectRepository:
                 ?,
                 ?
             )
+
+            ON CONFLICT(id)
+            DO UPDATE SET
+
+                title = excluded.title,
+
+                project_type = excluded.project_type,
+
+                status = excluded.status,
+
+                description = excluded.description
             """,
+
             (
                 str(project.id),
+
                 project.title,
+
                 "SONG",
+
                 project.status,
+
                 "Song creation project"
+
             )
         )
 
 
+
         connection.commit()
+
 
         connection.close()
 
+
+
+        print(
+            f"Project saved: {project.title}"
+        )
 
 
 
@@ -84,19 +108,32 @@ class SQLiteProjectRepository:
         cursor.execute(
             """
             SELECT
+
                 id,
+
                 title,
-                status
+
+                status,
+
+                project_type,
+
+                description
+
             FROM projects
+
             WHERE id = ?
+
             """,
+
             (
                 project_id,
             )
         )
 
 
+
         row = cursor.fetchone()
+
 
 
         connection.close()
@@ -105,12 +142,22 @@ class SQLiteProjectRepository:
 
         if row:
 
+
             project = SongProject(
                 title=row[1]
             )
 
 
+
+            #
+            # restore original id
+            #
+
+            project.id = row[0]
+
+
             project.status = row[2]
+
 
 
             return project

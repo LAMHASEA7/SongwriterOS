@@ -4,12 +4,35 @@ from core.application import WorkflowResult
 
 from .models import WorkflowExecution
 
+from core.events.models import (
+    WorkflowStartedEvent,
+    WorkflowStepStartedEvent,
+    WorkflowStepCompletedEvent,
+    WorkflowCompletedEvent
+)
+
 
 
 class WorkflowEngine:
     """
     Executes creative workflows.
     """
+
+
+
+    def _get_project_id(
+        self,
+        execution
+    ):
+
+        if execution.context:
+
+            return execution.context.project_id
+
+
+        return None
+
+
 
 
     def execute(
@@ -22,6 +45,7 @@ class WorkflowEngine:
         execution = WorkflowExecution(
             input_event=input_event
         )
+
 
 
         if workflow.context:
@@ -40,6 +64,31 @@ class WorkflowEngine:
 
 
 
+        #
+        # Workflow Started Event
+        #
+
+        if workflow.event_bus:
+
+
+            workflow.event_bus.publish(
+
+                WorkflowStartedEvent(
+
+                    workflow_name=workflow.name,
+
+                    project_id=self._get_project_id(
+                        execution
+                    ),
+
+                    created_at=datetime.utcnow()
+
+                )
+
+            )
+
+
+
         try:
 
 
@@ -49,15 +98,18 @@ class WorkflowEngine:
                 execution.current_step = step.name
 
 
+
                 history_item = {
 
                     "step": step.name,
 
                     "status": "RUNNING",
 
-                    "started_at": datetime.utcnow().isoformat()
+                    "started_at":
+                        datetime.utcnow().isoformat()
 
                 }
+
 
 
                 execution.history.append(
@@ -72,12 +124,36 @@ class WorkflowEngine:
 
 
 
+                #
+                # Workflow Step Started Event
+                #
+
+                if workflow.event_bus:
+
+
+                    workflow.event_bus.publish(
+
+                        WorkflowStepStartedEvent(
+
+                            workflow_name=workflow.name,
+
+                            step_name=step.name,
+
+                            created_at=datetime.utcnow()
+
+                        )
+
+                    )
+
+
+
                 try:
 
 
                     result = step.handler(
                         execution
                     )
+
 
 
                     history_item["status"] = "SUCCESS"
@@ -99,10 +175,43 @@ class WorkflowEngine:
 
 
 
+                    #
+                    # Workflow Step Completed Event
+                    #
+
+                    if workflow.event_bus:
+
+
+                        workflow.event_bus.publish(
+
+                            WorkflowStepCompletedEvent(
+
+                                workflow_name=workflow.name,
+
+                                step_name=step.name,
+
+                                status="SUCCESS",
+
+                                created_at=datetime.utcnow()
+
+                            )
+
+                        )
+
+
+
+
                 except Exception as error:
 
 
                     history_item["status"] = "FAILED"
+
+
+                    history_item[
+                        "finished_at"
+                    ] = datetime.utcnow().isoformat()
+
+
 
                     history_item[
                         "error"
@@ -124,7 +233,9 @@ class WorkflowEngine:
                     )
 
 
+
                     break
+
 
 
 
@@ -136,14 +247,18 @@ class WorkflowEngine:
 
 
 
+
         except Exception as error:
 
 
             execution.status = "FAILED"
 
+
+
             print(
                 "Workflow failed:"
             )
+
 
             print(
                 error
@@ -156,11 +271,47 @@ class WorkflowEngine:
 
 
 
+        #
+        # Workflow Completed Event
+        #
+
+        if workflow.event_bus:
+
+
+            workflow.event_bus.publish(
+
+                WorkflowCompletedEvent(
+
+                    workflow_name=workflow.name,
+
+                    project_id=self._get_project_id(
+                        execution
+                    ),
+
+                    status=execution.status,
+
+                    created_at=datetime.utcnow()
+
+                )
+
+            )
+
+
+
+
+        project_id = self._get_project_id(
+            execution
+        )
+
+
+
+
         return WorkflowResult(
 
             status=execution.status,
 
-            project_id=execution.context.project_id,
+            project_id=project_id,
+
 
             message=(
 
@@ -172,7 +323,9 @@ class WorkflowEngine:
 
             ),
 
+
             context=execution.context,
+
 
             history=execution.history
 

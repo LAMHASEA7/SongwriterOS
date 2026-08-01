@@ -5,6 +5,9 @@ from datetime import datetime
 
 @dataclass
 class WorkflowStartedEvent:
+    """
+    Published when workflow starts.
+    """
 
     workflow_name: str
 
@@ -14,8 +17,12 @@ class WorkflowStartedEvent:
 
 
 
+
 @dataclass
 class WorkflowStepStartedEvent:
+    """
+    Published when a workflow step starts.
+    """
 
     workflow_name: str
 
@@ -25,8 +32,12 @@ class WorkflowStepStartedEvent:
 
 
 
+
 @dataclass
 class WorkflowStepCompletedEvent:
+    """
+    Published when a workflow step completes.
+    """
 
     workflow_name: str
 
@@ -38,8 +49,12 @@ class WorkflowStepCompletedEvent:
 
 
 
+
 @dataclass
 class WorkflowCompletedEvent:
+    """
+    Published when workflow finishes.
+    """
 
     workflow_name: str
 
