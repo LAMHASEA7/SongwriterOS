@@ -10,7 +10,6 @@ from core.events.models import (
 )
 
 
-
 class SongCreationWorkflow:
 
 
@@ -23,7 +22,6 @@ class SongCreationWorkflow:
         event_bus
     ):
 
-
         self.workflow = Workflow(
             name="Song Creation"
         )
@@ -32,6 +30,18 @@ class SongCreationWorkflow:
         self.workflow.set_event_bus(
             event_bus
         )
+
+
+        #
+        # Share ExecutionContext
+        #
+        # ใช้ context เดียวกับ agents
+        # เพื่อให้ WorkflowResult สามารถ export SongProject ได้
+        #
+
+        self.context = concept_agent.context
+
+        self.workflow.context = self.context
 
 
 

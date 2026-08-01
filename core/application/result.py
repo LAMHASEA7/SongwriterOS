@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Any
 import json
+from datetime import datetime
+from uuid import UUID
+
 
 
 @dataclass
@@ -15,76 +18,124 @@ class WorkflowResult:
 
     context: Any = None
 
+    song: Any = None
+
     history: list = field(
         default_factory=list
     )
 
 
 
-    def to_dict(self):
-
-        song = None
+    def song_to_dict(self):
 
 
-        if self.context and self.context.song_project:
-
-            project = self.context.song_project
-
-
-            song = {
-
-                "id": str(project.id),
-
-                "title": project.title,
-
-                "status": project.status,
+        if not self.context:
+            return None
 
 
-                "concept":
-                    self._serialize(project.concept),
+        song = getattr(
+            self.context,
+            "song_project",
+            None
+        )
 
 
-                "lyrics":
-                    self._serialize(project.lyrics),
-
-
-                "melody":
-                    self._serialize(project.melody),
-
-
-                "arrangement":
-                    self._serialize(project.arrangement)
-
-            }
+        if not song:
+            return None
 
 
 
-        return {
+        data = {
 
+            "id": str(song.id),
 
-            "status": self.status,
-
-
-            "project_id":
-                self.project_id,
-
-
-            "message":
-                self.message,
-
-
-            "song":
-                song,
-
-
-            "history":
-                self.history
+            "title": song.title
 
         }
 
 
 
+        if song.concept:
+
+            data["concept"] = {
+
+                "theme": song.concept.theme,
+
+                "emotion": song.concept.emotion,
+
+                "message": song.concept.message
+
+            }
+
+
+
+        if song.lyrics:
+
+            data["lyrics"] = {
+
+                "title": song.lyrics.title,
+
+                "content": song.lyrics.content
+
+            }
+
+
+
+        if song.melody:
+
+            data["melody"] = {
+
+                "key": song.melody.key,
+
+                "tempo": song.melody.tempo,
+
+                "mood": song.melody.mood,
+
+                "description": song.melody.description
+
+            }
+
+
+
+        if song.arrangement:
+
+            data["arrangement"] = {
+
+                "instruments": song.arrangement.instruments,
+
+                "structure": song.arrangement.structure,
+
+                "atmosphere": song.arrangement.atmosphere
+
+            }
+
+
+        return data
+
+
+
+
+    def to_dict(self):
+
+        return {
+
+            "status": self.status,
+
+            "project_id": self.project_id,
+
+            "message": self.message,
+
+            "song": self.song_to_dict(),
+
+            "history": self.history
+
+        }
+
+
+
+
     def to_json(self):
+
 
         return json.dumps(
 
@@ -94,40 +145,18 @@ class WorkflowResult:
 
             ensure_ascii=False,
 
-            default=str
+            default=self.json_serializer
 
         )
 
 
 
-    def _serialize(
-        self,
-        obj
-    ):
+    @staticmethod
+    def json_serializer(obj):
 
-        if obj is None:
+        if isinstance(obj, (datetime, UUID)):
 
-            return None
-
-
-        if hasattr(
-            obj,
-            "__dict__"
-        ):
-
-            data = {}
-
-            for key,value in obj.__dict__.items():
-
-                if key.startswith("_"):
-
-                    continue
-
-
-                data[key] = value
-
-
-            return data
+            return str(obj)
 
 
         return str(obj)

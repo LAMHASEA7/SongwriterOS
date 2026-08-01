@@ -20,7 +20,9 @@ class WorkflowEngine:
         execution = WorkflowExecution(
             input_event=input_event
         )
+        if workflow.context:
 
+            execution.context = workflow.context
 
         execution.status = "RUNNING"
 
@@ -31,7 +33,6 @@ class WorkflowEngine:
 
 
         for step in workflow.steps:
-
 
             execution.current_step = step.name
 
@@ -66,6 +67,7 @@ class WorkflowEngine:
 
 
         execution.status = "SUCCESS"
+
 
         execution.finished_at = datetime.utcnow()
 
