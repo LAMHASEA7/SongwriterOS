@@ -14,6 +14,7 @@ class EventBus:
         if event_type not in self.subscribers:
             self.subscribers[event_type] = []
 
+
         self.subscribers[event_type].append(
             handler
         )
@@ -32,6 +33,16 @@ class EventBus:
         )
 
 
+        results = []
+
+
         for handler in handlers:
 
-            handler(event)
+            result = handler(event)
+
+            results.append(
+                result
+            )
+
+
+        return results

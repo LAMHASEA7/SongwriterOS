@@ -1,45 +1,57 @@
+from core.agents.runtime.agent import Agent
+
 from core.agents.models import AgentCapability
+
 from core.domain.models import CreativeWork
-from core.events.models import (
-    ConceptCreatedEvent,
-    LyricsCreatedEvent,
-)
+
+from core.ai.prompts import LyricPrompt
 
 
-class LyricAgent:
+class LyricAgent(Agent):
 
     name = "Lyric Agent"
+
     capability = AgentCapability.LYRICS
 
 
-    def __init__(self, event_bus):
+    def __init__(
+        self,
+        work_repository,
+        ai_service
+    ):
 
-        self.event_bus = event_bus
+        self.work_repository = work_repository
+        self.ai_service = ai_service
 
 
     def handle(
         self,
-        event: ConceptCreatedEvent
-    ) -> CreativeWork:
+        event
+    ):
 
+        concept = event.state["concept"]
+
+        prompt = LyricPrompt.from_concept(
+            concept
+        )
+
+        response = self.ai_service.generate(
+            prompt
+        )
 
         work = CreativeWork(
-    title="Memory",
-    work_type="lyrics",
-    content="Keep the moment alive"
+            title=f"{concept.theme} Song",
+            work_type="Lyrics",
+            content=response.text
         )
 
+        self.work_repository.save(
+            work
+        )
 
         print(
-            f"{self.name} created: {work}"
+            "Lyric Agent saved:",
+            work
         )
-
-
-        self.event_bus.publish(
-            LyricsCreatedEvent(
-                work=work
-            )
-        )
-
 
         return work

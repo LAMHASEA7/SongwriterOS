@@ -1,14 +1,19 @@
 from datetime import datetime
 
 from .models import WorkflowExecution
-
+from datetime import datetime
 
 class WorkflowEngine:
     """
     Executes creative workflows.
     """
 
-    def execute(self, workflow, input_event=None):
+
+    def execute(
+        self,
+        workflow,
+        input_event=None
+    ):
 
         execution = WorkflowExecution(
             input_event=input_event
@@ -16,13 +21,16 @@ class WorkflowEngine:
 
         execution.status = "RUNNING"
 
+
         print(
             f"Workflow: {workflow.name}"
         )
 
+
         for step in workflow.steps:
 
             execution.current_step = step.name
+
 
             execution.history.append(
                 {
@@ -31,15 +39,19 @@ class WorkflowEngine:
                 }
             )
 
+
             print(
                 f"Executing step: {step.name}"
             )
+
 
             result = step.handler(
                 execution
             )
 
+
             execution.history[-1]["status"] = "SUCCESS"
+
 
             if step.output_key:
 
@@ -47,7 +59,10 @@ class WorkflowEngine:
                     step.output_key
                 ] = result
 
+
         execution.status = "SUCCESS"
+
         execution.finished_at = datetime.utcnow()
+
 
         return execution

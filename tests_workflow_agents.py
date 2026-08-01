@@ -1,4 +1,7 @@
 from core.workflow.engine import WorkflowEngine
+from core.ai.factory import ProviderFactory
+from core.events.bus.event_bus import EventBus
+from core.config import settings
 
 from core.workflow.models import (
     Workflow,
@@ -10,8 +13,6 @@ from core.agents.runtime import (
     LyricAgent
 )
 
-from core.events.bus.event_bus import EventBus
-
 from core.infrastructure.repositories import (
     SQLiteWorkRepository
 )
@@ -21,15 +22,10 @@ from core.ai.runtime import (
     AIService
 )
 
-from core.ai.providers import (
-    MockProvider
-)
-
 from core.events.models import (
     ProjectCreatedEvent
 )
 
-from core.config import settings
 
 
 # =========================
@@ -48,14 +44,14 @@ work_repository = SQLiteWorkRepository(
 # AI Layer
 # =========================
 
+
 registry = ProviderRegistry()
 
-
-if settings.ai_provider == "mock":
-
-    registry.register(
-        MockProvider()
+registry.register(
+    ProviderFactory.create(
+        settings.ai_provider
     )
+)
 
 
 ai_service = AIService(
