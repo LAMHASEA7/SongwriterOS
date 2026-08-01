@@ -1,7 +1,9 @@
 from datetime import datetime
 
+from core.application import WorkflowResult
+
 from .models import WorkflowExecution
-from datetime import datetime
+
 
 class WorkflowEngine:
     """
@@ -19,6 +21,7 @@ class WorkflowEngine:
             input_event=input_event
         )
 
+
         execution.status = "RUNNING"
 
 
@@ -28,6 +31,7 @@ class WorkflowEngine:
 
 
         for step in workflow.steps:
+
 
             execution.current_step = step.name
 
@@ -60,9 +64,23 @@ class WorkflowEngine:
                 ] = result
 
 
+
         execution.status = "SUCCESS"
 
         execution.finished_at = datetime.utcnow()
 
 
-        return execution
+
+        return WorkflowResult(
+
+            status=execution.status,
+
+            project_id=execution.context.project_id,
+
+            message="Workflow completed successfully",
+
+            context=execution.context,
+
+            history=execution.history
+
+        )

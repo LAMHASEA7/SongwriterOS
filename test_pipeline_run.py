@@ -7,10 +7,27 @@ from core.agents.runtime.lyric_agent import LyricAgent
 
 from core.events.models import ConceptCreatedEvent
 
+from core.ai.factory import ProviderFactory
+
+from core.infrastructure.repositories.sqlite_work_repository import SQLiteWorkRepository
+
+from core.config import settings
+
 
 def main():
 
     event_bus = EventBus()
+
+
+    ai_provider = ProviderFactory.create(
+        "openai"
+    )
+
+
+    work_repository = SQLiteWorkRepository(
+        settings.database_path
+    )
+
 
     dispatcher = AgentDispatcher(
         event_bus
@@ -18,11 +35,14 @@ def main():
 
 
     concept_agent = ConceptAgent(
-        event_bus
+        event_bus,
+        ai_provider
     )
 
+
     lyric_agent = LyricAgent(
-        event_bus
+        work_repository,
+        ai_provider
     )
 
 
@@ -38,4 +58,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()

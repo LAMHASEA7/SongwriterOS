@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from core.domain.models import CreativeWork
 
 

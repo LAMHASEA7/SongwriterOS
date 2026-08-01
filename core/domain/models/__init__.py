@@ -8,3 +8,4 @@ from .evaluation import Evaluation
 from .version import Version
 from .melody import Melody
 from .arrangement import Arrangement
+from core.domain.song_project import SongProject

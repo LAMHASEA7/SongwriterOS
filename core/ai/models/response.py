@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -10,4 +10,16 @@ class AIResponse:
 
     provider: str = ""
 
-    usage: dict = None
+
+    usage: dict = field(
+        default_factory=dict
+    )
+
+
+    latency: float = 0.0
+
+
+    success: bool = True
+
+
+    error: str = ""
