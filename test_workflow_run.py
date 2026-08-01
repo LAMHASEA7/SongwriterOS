@@ -7,11 +7,13 @@ from core.agents.runtime import (
     ConceptAgent,
     LyricAgent,
     MelodyAgent,
-    ArrangementAgent
+    ArrangementAgent,
+    PersistenceAgent
 )
 
 from core.infrastructure.repositories import (
-    SQLiteWorkRepository
+    SQLiteWorkRepository,
+    SQLiteProjectRepository
 )
 
 from core.workflow.song_creation import SongCreationWorkflow
@@ -91,7 +93,11 @@ def main():
     # Repository
     #
 
-    repository = SQLiteWorkRepository(
+    work_repository = SQLiteWorkRepository(
+        settings.database_path
+    )
+
+    project_repository = SQLiteProjectRepository(
         settings.database_path
     )
 
@@ -109,7 +115,7 @@ def main():
 
 
     lyric_agent = LyricAgent(
-        repository,
+        work_repository,
         ai_service,
         context
     )
@@ -125,7 +131,10 @@ def main():
         event_bus,
         context
     )
-
+    persistence_agent = PersistenceAgent(
+        project_repository,
+        context
+    )
 
 
     #
@@ -141,6 +150,8 @@ def main():
         melody_agent,
 
         arrangement_agent,
+
+        persistence_agent,
 
         event_bus
 

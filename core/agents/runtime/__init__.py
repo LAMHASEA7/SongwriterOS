@@ -8,6 +8,8 @@ from .melody_agent import MelodyAgent
 
 from .arrangement_agent import ArrangementAgent
 
+from .persistence_agent import PersistenceAgent
+
 
 __all__ = [
 
@@ -19,6 +21,8 @@ __all__ = [
 
     "MelodyAgent",
 
-    "ArrangementAgent"
+    "ArrangementAgent",
+
+    "PersistenceAgent",
 
 ]

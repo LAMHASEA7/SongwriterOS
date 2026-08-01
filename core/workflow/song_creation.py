@@ -19,6 +19,7 @@ class SongCreationWorkflow:
         lyric_agent,
         melody_agent,
         arrangement_agent,
+        persistence_agent,
         event_bus
     ):
 
@@ -35,14 +36,10 @@ class SongCreationWorkflow:
         #
         # Share ExecutionContext
         #
-        # ใช้ context เดียวกับ agents
-        # เพื่อให้ WorkflowResult สามารถ export SongProject ได้
-        #
 
         self.context = concept_agent.context
 
         self.workflow.context = self.context
-
 
 
         #
@@ -71,7 +68,6 @@ class SongCreationWorkflow:
             )
 
         )
-
 
 
         #
@@ -109,7 +105,6 @@ class SongCreationWorkflow:
         )
 
 
-
         #
         # Step 3 Melody
         #
@@ -143,7 +138,6 @@ class SongCreationWorkflow:
             )
 
         )
-
 
 
         #
@@ -180,6 +174,33 @@ class SongCreationWorkflow:
 
         )
 
+
+        #
+        # Step 5 Save Project
+        #
+
+        self.workflow.add_step(
+
+            WorkflowStep(
+
+                name="Save Project",
+
+                handler=AgentStep(
+
+                    name="Persistence Agent",
+
+                    agent=persistence_agent,
+
+                    event_factory=lambda execution:
+                        execution.context.song_project,
+
+                    output_key="project"
+
+                )
+
+            )
+
+        )
 
 
     def build(self):
